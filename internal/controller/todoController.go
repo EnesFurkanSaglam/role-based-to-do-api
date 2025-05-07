@@ -18,6 +18,11 @@ type UpdateListRequest struct {
 	Name string `json:"name"`
 }
 
+type UpdateStepRequest struct {
+	ID      int    `json:"id"`
+	Content string `json:"content"`
+}
+
 func CreateListHandler(w http.ResponseWriter, r *http.Request) {
 	claims := r.Context().Value(middleware.UserContextKey).(*util.Claims)
 
@@ -127,4 +132,25 @@ func UpdateListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte("List name updated."))
+}
+
+func UpdateStepHandler(w http.ResponseWriter, r *http.Request) {
+	var req UpdateStepRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Geçersiz istek", http.StatusBadRequest)
+		return
+	}
+
+	if req.Content == "" {
+		http.Error(w, "İçerik boş olamaz", http.StatusBadRequest)
+		return
+	}
+
+	ok := service.UpdateStep(req.ID, req.Content)
+	if !ok {
+		http.Error(w, "Adım bulunamadı veya silinmiş", http.StatusNotFound)
+		return
+	}
+
+	w.Write([]byte("Adım güncellendi."))
 }

@@ -133,3 +133,14 @@ func UpdateListName(listID int, newName string) bool {
 	}
 	return false
 }
+
+func UpdateStepContent(stepID int, newContent string) bool {
+	for i, s := range todoSteps {
+		if s.ID == stepID && s.DeletedAt == nil {
+			todoSteps[i].Content = newContent
+			todoSteps[i].UpdatedAt = time.Now()
+			return true
+		}
+	}
+	return false
+}

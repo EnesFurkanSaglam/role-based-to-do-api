@@ -37,3 +37,7 @@ func DeleteList(listID int) bool {
 func UpdateList(listID int, newName string) bool {
 	return repository.UpdateListName(listID, newName)
 }
+
+func UpdateStep(stepID int, content string) bool {
+	return repository.UpdateStepContent(stepID, content)
+}
