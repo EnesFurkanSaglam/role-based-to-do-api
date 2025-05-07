@@ -1,5 +1,4 @@
 # 🗂️ Role-Based TO-DO API (Golang)
-
 ## 🚀 Başlatmak için
 
 🔗 **Canlı API Adresi:** [https://role-based-to-do-api-production.up.railway.app](https://role-based-to-do-api-production.up.railway.app)
@@ -103,112 +102,283 @@ role-based-to-do-api/
 └── main.go
 ```
 
+---
 
+## 🔐 /login
 
+### Genel Bilgiler
 
-# 🗂️ Role-Based TO-DO API (Golang)
+| Özellik          | Değer              |
+|------------------|--------------------|
+| Yöntem (Method)  | `POST`             |
+| URL              | `/login`           |
+| Kimlik Doğrulama | Gerekmez           |
+| İçerik Tipi      | `application/json` |
 
-## 🚀 Getting Started
-
-🔗 **Live API URL:** [https://role-based-to-do-api-production.up.railway.app](https://role-based-to-do-api-production.up.railway.app)
-
-This project contains the **backend API** of a TO-DO list that works with role-based user management.  
-It is written in Golang and developed following the `MVC + Clean Architecture` pattern.
-
-## 📌 Features
-
-- 🔐 **JWT-based user authentication**
-- 👥 **Role-Based Authorization** (admin / basic)
-- ✅ TO-DO list & step management
-- 🧱 **Soft Delete** (data is not physically deleted)
-- ⏱️ `UpdatedAt` update logic
-- 📊 **% completion rate** based on steps completed
-- 📂 Layered structure: `controller`, `service`, `repository`, `model`, `middleware`, `util`
-
-## 👤 User Credentials
-
-| Username | Password    | Role   |
-|----------|-------------|--------|
-| `enes`   | `1234`      | basic  |
-| `admin`  | `adminpass` | admin  |
-
-## 🚀 Getting Started
-
-### 1. Environment Variables `.env`
-```
-JWT_SECRET_KEY=your_jwt_key
-```
-
-### 2. Terminal:
-```bash
-go run cmd/main.go
-```
-
-## 🧪 API Endpoints
-
-### 🔑 /login
-```http
-POST /login
+### İstek
+```json
 {
   "username": "enes",
   "password": "1234"
 }
 ```
-🟢 Response: `{ "token": "..." }`
 
-### 📁 /lists
+### Yanıtlar
 
-| Endpoint             | Description                       |
-|----------------------|-----------------------------------|
-| `POST /lists`        | Creates a new list                |
-| `GET /lists`         | Retrieves list(s)                 |
-| `POST /lists/delete` | Soft-deletes a list               |
-| `POST /lists/update` | Updates a list name               |
-
-**Example Add List:**
+**200 OK**
 ```json
 {
-  "name": "Final Project Tasks"
+  "token": "JWT_Token_Bilgisi"
 }
 ```
 
-### 📄 /steps
+**401 Unauthorized**
+```json
+{
+  "error": "invalid credentials"
+}
+```
 
-| Endpoint                | Description                            |
-|-------------------------|----------------------------------------|
-| `POST /steps`           | Adds a step (task)                     |
-| `GET /steps?list_id=1`  | Lists steps of a specific list         |
-| `POST /steps/complete`  | Marks a step as completed              |
-| `POST /steps/delete`    | Soft-deletes a step                    |
-| `POST /steps/update`    | Updates step content                   |
+### Notlar
 
-**Example Add Step:**
+- Başarılı giriş sonrası dönen token, tüm korumalı isteklerde `Authorization: Bearer <token>` olarak kullanılmalıdır.
+
+---
+
+## 📁 /lists
+
+### 🔸 GET /lists
+
+| Özellik          | Değer              |
+|------------------|--------------------|
+| Yöntem           | `GET`              |
+| Kimlik Doğrulama | Gerekli (`JWT`)    |
+| Açıklama         | Kullanıcının (veya admin ise tüm kullanıcıların) listelerini getirir |
+
+**Yanıt:**
+```json
+[
+  {
+    "id": 1,
+    "name": "Final Projesi",
+    "owner": "enes",
+    "is_deleted": false,
+    "updated_at": "2024-05-07T15:00:00Z"
+  }
+]
+```
+
+---
+
+### 🔸 POST /lists
+
+| Özellik          | Değer              |
+|------------------|--------------------|
+| Yöntem           | `POST`             |
+| Kimlik Doğrulama | Gerekli (`JWT`)    |
+| Açıklama         | Yeni bir liste oluşturur |
+
+**İstek:**
+```json
+{
+  "name": "Yeni Liste Adı"
+}
+```
+
+**Yanıt:**
+```json
+{
+  "id": 2,
+  "name": "Yeni Liste Adı",
+  "owner": "enes"
+}
+```
+
+**400 Bad Request:**
+```json
+{
+  "error": "list name required"
+}
+```
+
+---
+
+### 🔸 POST /lists/delete
+
+| Özellik          | Değer              |
+|------------------|--------------------|
+| Yöntem           | `POST`             |
+| Kimlik Doğrulama | Gerekli (`JWT`)    |
+| Açıklama         | Listeyi soft delete yapar |
+
+**İstek:**
+```json
+{
+  "list_id": 1
+}
+```
+
+**Yanıt:**
+```json
+{
+  "message": "List deleted"
+}
+```
+
+**404 Not Found:**
+```json
+{
+  "error": "list not found"
+}
+```
+
+---
+
+### 🔸 POST /lists/update
+
+| Özellik          | Değer              |
+|------------------|--------------------|
+| Yöntem           | `POST`             |
+| Kimlik Doğrulama | Gerekli (`JWT`)    |
+| Açıklama         | Listenin adını günceller |
+
+**İstek:**
 ```json
 {
   "list_id": 1,
-  "content": "Prepare software PDF report"
+  "new_name": "Güncellenmiş Liste Adı"
 }
 ```
 
-## 🛡️ Role-Based Access Logic
-
-- `basic` user: can only see **their own lists and steps**
-- `admin` user: can access **all users' data**
-- All actions require `JWT` authorization with `Authorization: Bearer <token>` header
-
-## 📁 Project Structure
-
+**Yanıt:**
+```json
+{
+  "message": "List updated"
+}
 ```
-role-based-to-do-api/
-|   
-├── internal/
-│   ├── controller/
-│   ├── service/
-│   ├── repository/
-│   ├── middleware/
-│   ├── model/
-│   └── util/
-├── .env
-└── go.mod
-└── main.go
+
+---
+
+## 📄 /steps
+
+### 🔸 GET /steps?list_id=X
+
+| Özellik          | Değer              |
+|------------------|--------------------|
+| Yöntem           | `GET`              |
+| Kimlik Doğrulama | Gerekli (`JWT`)    |
+| Açıklama         | Belirli bir listeye ait adımları getirir |
+
+**Yanıt:**
+```json
+[
+  {
+    "id": 1,
+    "list_id": 1,
+    "content": "Rapor hazırla",
+    "is_completed": false
+  }
+]
 ```
+
+---
+
+### 🔸 POST /steps
+
+| Özellik          | Değer              |
+|------------------|--------------------|
+| Yöntem           | `POST`             |
+| Kimlik Doğrulama | Gerekli (`JWT`)    |
+| Açıklama         | Yeni bir adım (step) ekler |
+
+**İstek:**
+```json
+{
+  "list_id": 1,
+  "content": "Sunumu yap"
+}
+```
+
+**Yanıt:**
+```json
+{
+  "id": 3,
+  "list_id": 1,
+  "content": "Sunumu yap",
+  "is_completed": false
+}
+```
+
+---
+
+### 🔸 POST /steps/complete
+
+| Özellik          | Değer              |
+|------------------|--------------------|
+| Yöntem           | `POST`             |
+| Kimlik Doğrulama | Gerekli (`JWT`)    |
+| Açıklama         | Adımı tamamlandı olarak işaretler |
+
+**İstek:**
+```json
+{
+  "step_id": 3
+}
+```
+
+**Yanıt:**
+```json
+{
+  "message": "Step completed"
+}
+```
+
+---
+
+### 🔸 POST /steps/delete
+
+| Özellik          | Değer              |
+|------------------|--------------------|
+| Yöntem           | `POST`             |
+| Kimlik Doğrulama | Gerekli (`JWT`)    |
+| Açıklama         | Adımı soft delete yapar |
+
+**İstek:**
+```json
+{
+  "step_id": 2
+}
+```
+
+**Yanıt:**
+```json
+{
+  "message": "Step deleted"
+}
+```
+
+---
+
+### 🔸 POST /steps/update
+
+| Özellik          | Değer              |
+|------------------|--------------------|
+| Yöntem           | `POST`             |
+| Kimlik Doğrulama | Gerekli (`JWT`)    |
+| Açıklama         | Adım içeriğini günceller |
+
+**İstek:**
+```json
+{
+  "step_id": 1,
+  "new_content": "Yeni içerik"
+}
+```
+
+**Yanıt:**
+```json
+{
+  "message": "Step updated"
+}
+```
+
