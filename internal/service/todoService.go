@@ -33,3 +33,7 @@ func DeleteStep(stepID int) bool {
 func DeleteList(listID int) bool {
 	return repository.SoftDeleteList(listID)
 }
+
+func UpdateList(listID int, newName string) bool {
+	return repository.UpdateListName(listID, newName)
+}

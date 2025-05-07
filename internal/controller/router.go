@@ -28,6 +28,7 @@ func NewRouter() *mux.Router {
 	s.HandleFunc("/steps/complete", CompleteStepHandler).Methods("POST")
 	s.HandleFunc("/steps/delete", DeleteStepHandler).Methods("POST")
 	s.HandleFunc("/delete", DeleteListHandler).Methods("POST")
+	s.HandleFunc("/lists/update", UpdateListHandler).Methods("POST")
 
 	return r
 }

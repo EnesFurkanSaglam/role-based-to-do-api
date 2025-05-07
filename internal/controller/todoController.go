@@ -13,6 +13,11 @@ type CreateListRequest struct {
 	Name string `json:"name"`
 }
 
+type UpdateListRequest struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 func CreateListHandler(w http.ResponseWriter, r *http.Request) {
 	claims := r.Context().Value(middleware.UserContextKey).(*util.Claims)
 
@@ -101,4 +106,25 @@ func DeleteListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte("List deleted (soft delete)."))
+}
+
+func UpdateListHandler(w http.ResponseWriter, r *http.Request) {
+	var req UpdateListRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	if req.Name == "" {
+		http.Error(w, "New name can not be empty", http.StatusBadRequest)
+		return
+	}
+
+	ok := service.UpdateList(req.ID, req.Name)
+	if !ok {
+		http.Error(w, "List not found", http.StatusNotFound)
+		return
+	}
+
+	w.Write([]byte("List name updated."))
 }

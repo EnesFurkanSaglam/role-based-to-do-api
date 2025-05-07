@@ -122,3 +122,14 @@ func SoftDeleteList(listID int) bool {
 	}
 	return false
 }
+
+func UpdateListName(listID int, newName string) bool {
+	for i, l := range todoLists {
+		if l.ID == listID && l.DeletedAt == nil {
+			todoLists[i].Name = newName
+			todoLists[i].UpdatedAt = time.Now()
+			return true
+		}
+	}
+	return false
+}
