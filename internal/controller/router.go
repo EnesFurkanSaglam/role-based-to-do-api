@@ -18,5 +18,11 @@ func NewRouter() *mux.Router {
 		w.Write([]byte("as"))
 	}).Methods("GET")
 
+	s := r.PathPrefix("/lists").Subrouter()
+	s.Use(middleware.JWTAuthMiddleware)
+
+	s.HandleFunc("", CreateListHandler).Methods("POST")
+	s.HandleFunc("", GetMyListsHandler).Methods("GET")
+
 	return r
 }
