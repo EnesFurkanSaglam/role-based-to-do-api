@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"role-based-to-do-api/internal/middleware"
 	"role-based-to-do-api/internal/service"
@@ -27,4 +28,61 @@ func GetMyListsHandler(w http.ResponseWriter, r *http.Request) {
 
 	lists := service.GetUserLists(claims.Username, claims.Role)
 	json.NewEncoder(w).Encode(lists)
+}
+
+type CreateStepRequest struct {
+	ListID  int    `json:"list_id"`
+	Content string `json:"content"`
+}
+
+func AddStepHandler(w http.ResponseWriter, r *http.Request) {
+	var req CreateStepRequest
+	json.NewDecoder(r.Body).Decode(&req)
+
+	step := service.AddStep(req.ListID, req.Content)
+	json.NewEncoder(w).Encode(step)
+}
+
+type IDRequest struct {
+	ID int `json:"id"`
+}
+
+func CompleteStepHandler(w http.ResponseWriter, r *http.Request) {
+	var req IDRequest
+	json.NewDecoder(r.Body).Decode(&req)
+
+	ok := service.CompleteStep(req.ID)
+	if !ok {
+		http.Error(w, "Step not found", http.StatusNotFound)
+		return
+	}
+
+	w.Write([]byte("Completed"))
+}
+
+func DeleteStepHandler(w http.ResponseWriter, r *http.Request) {
+	var req IDRequest
+	json.NewDecoder(r.Body).Decode(&req)
+
+	ok := service.DeleteStep(req.ID)
+	if !ok {
+		http.Error(w, "Step not found", http.StatusNotFound)
+		return
+	}
+
+	w.Write([]byte("Deleted"))
+}
+
+func GetStepsHandler(w http.ResponseWriter, r *http.Request) {
+	listID := r.URL.Query().Get("list_id")
+	if listID == "" {
+		http.Error(w, "list_id not found", http.StatusBadRequest)
+		return
+	}
+
+	var id int
+	fmt.Sscanf(listID, "%d", &id)
+
+	steps := service.GetSteps(id)
+	json.NewEncoder(w).Encode(steps)
 }
