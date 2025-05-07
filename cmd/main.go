@@ -3,17 +3,17 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"role-based-to-do-api/internal/controller"
 )
 
 func main() {
 
+	r := controller.NewRouter()
+	r.HandleFunc("/login", controller.LoginHandler).Methods("POST")
+
 	fmt.Println("8082 port")
 
-	http.HandleFunc("/sa", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("as"))
-	})
-	err := http.ListenAndServe(":8082", nil)
+	err := http.ListenAndServe(":8082", r)
 	if err != nil {
 		panic(err)
 	}
