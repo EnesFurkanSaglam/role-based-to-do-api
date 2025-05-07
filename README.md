@@ -90,8 +90,7 @@ POST /login
 
 ```
 role-based-to-do-api/
-├── cmd/
-│   └── main.go
+|   
 ├── internal/
 │   ├── controller/
 │   ├── service/
@@ -101,6 +100,7 @@ role-based-to-do-api/
 │   └── util/
 ├── .env
 └── go.mod
+└── main.go
 ```
 
 
@@ -200,8 +200,7 @@ POST /login
 
 ```
 role-based-to-do-api/
-├── cmd/
-│   └── main.go
+|   
 ├── internal/
 │   ├── controller/
 │   ├── service/
@@ -211,4 +210,5 @@ role-based-to-do-api/
 │   └── util/
 ├── .env
 └── go.mod
+└── main.go
 ```
