@@ -2,22 +2,19 @@ package util
 
 import (
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"time"
 )
 
-var jwtKey []byte
+var jwtKey = []byte(getEnvOrPanic("JWT_SECRET_KEY"))
 
-func init() {
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+func getEnvOrPanic(key string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		log.Fatalf("Environment variable %s not set", key)
 	}
-
-	jwtKey = []byte(os.Getenv("JWT_SECRET_KEY"))
+	return val
 }
 
 type Claims struct {
@@ -37,7 +34,6 @@ func GenerateJWT(username, role string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtKey)
-
 }
 
 func ParseJWT(tokenStr string) (*Claims, error) {
