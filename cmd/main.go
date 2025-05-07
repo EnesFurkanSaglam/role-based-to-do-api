@@ -7,12 +7,8 @@ import (
 )
 
 func main() {
-
 	r := controller.NewRouter()
-	r.HandleFunc("/login", controller.LoginHandler).Methods("POST")
-
 	fmt.Println("8082 port")
-
 	err := http.ListenAndServe(":8082", r)
 	if err != nil {
 		panic(err)
