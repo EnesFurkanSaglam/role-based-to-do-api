@@ -29,3 +29,7 @@ func CompleteStep(stepID int) bool {
 func DeleteStep(stepID int) bool {
 	return repository.DeleteStep(stepID)
 }
+
+func DeleteList(listID int) bool {
+	return repository.SoftDeleteList(listID)
+}

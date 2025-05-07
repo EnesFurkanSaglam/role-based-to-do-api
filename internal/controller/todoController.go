@@ -86,3 +86,19 @@ func GetStepsHandler(w http.ResponseWriter, r *http.Request) {
 	steps := service.GetSteps(id)
 	json.NewEncoder(w).Encode(steps)
 }
+
+func DeleteListHandler(w http.ResponseWriter, r *http.Request) {
+	var req IDRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	ok := service.DeleteList(req.ID)
+	if !ok {
+		http.Error(w, "List not found or already deleted", http.StatusNotFound)
+		return
+	}
+
+	w.Write([]byte("List deleted (soft delete)."))
+}

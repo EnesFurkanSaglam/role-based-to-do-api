@@ -110,3 +110,15 @@ func updateListCompletion(listID int) {
 		}
 	}
 }
+
+func SoftDeleteList(listID int) bool {
+	now := time.Now()
+	for i, l := range todoLists {
+		if l.ID == listID && l.DeletedAt == nil {
+			todoLists[i].DeletedAt = &now
+			todoLists[i].UpdatedAt = now
+			return true
+		}
+	}
+	return false
+}
